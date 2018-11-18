@@ -1,0 +1,38 @@
+
+{% extends "layout.html" %}
+{% block content %}
+    <div class="row">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for pgfile in pg_files %}
+                <tr><td>{{ pg_file }}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <p>Upload</p>
+            <form class="form" enctype=multipart/form-data method="post" name="pgfile">
+                {{form.hidden_tag()}}
+                {{ wtf.form_errors(form, hiddens="only") }}
+                <div class="row">
+                     <div class="col-md-4">
+                        {{ wtf.form_field(form.name) }}
+                        {{ wtf.form_field(form.file) }}
+                     </div>
+                </div>
+                <div class="row">
+                    <button type="submit" class="btn btn-default">Save</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+{% endblock %}
+
