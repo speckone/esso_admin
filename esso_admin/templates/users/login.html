@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% import "wtf.html" as wtf %}
+{% block content %}
+<div class="row">
+      <div class="col-md-4">
+          <form class="form" method="post" name="login">
+                  {{form.hidden_tag()}}
+                  {{ wtf.form_errors(form, hiddens="only") }}
+                  {{ wtf.form_field(form.username) }}
+                  {{ wtf.form_field(form.password) }}
+                  {{ wtf.form_field(form.remember) }}
+                  <button type="submit" class="btn btn-default">Sign in</button>
+          </form>
+      </div>
+</div>
+{% endblock %}
