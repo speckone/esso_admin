@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 """User views."""
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_required, logout_user, login_manager, login_user
+from flask_login import login_required, logout_user, login_user
 from esso_admin.user.forms import LoginForm, RegisterForm
 from esso_admin.user.models import User
 from esso_admin.utils import flash_errors
+from esso_admin.extensions import login_manager
 
 
 blueprint = Blueprint('user', __name__, url_prefix='/users', static_folder='../static')
 
-@login_manager.user_loader
+
+@login_manager.user_loader()
 def load_user(user_id):
     """Load user by ID."""
     return User.get_by_id(int(user_id))
