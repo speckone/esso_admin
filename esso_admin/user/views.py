@@ -11,7 +11,7 @@ from esso_admin.extensions import login_manager
 blueprint = Blueprint('user', __name__, url_prefix='/users', static_folder='../static')
 
 
-@login_manager.user_loader()
+@login_manager.user_loader
 def load_user(user_id):
     """Load user by ID."""
     return User.get_by_id(int(user_id))
