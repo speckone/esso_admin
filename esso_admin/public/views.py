@@ -79,7 +79,7 @@ def drawbot():
             file.save(os.path.join(current_app.config['APP_DIR'], 'static', filename))
 
     pg_files = PgFile.query.all()
-    return render_template('public/drawbot.html', pg_files=pg_files)
+    return render_template('public/drawbot.html', pg_files=pg_files, form=form)
 
 
 @blueprint.route('/action/<action_id>', methods=('GET', 'POST',))
