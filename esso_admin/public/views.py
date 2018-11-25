@@ -31,8 +31,8 @@ def drawbot():
     """Shows drawbot status and functions."""
     form = PgUploadForm()
     if form.validate_on_submit():
-        if 'file' in request.files:
-            file = request.files['file']
+        file = request.files.get('file')
+        if file:
             filename = secure_filename(form.data.file)
             file.save(os.path.join(current_app.config['APP_DIR'], 'static', filename))
 
