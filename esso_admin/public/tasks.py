@@ -52,7 +52,7 @@ def get_string_lengths(x, y):
     return steps1_rounded, steps2_rounded
 
 
-@celery.task
+@celery.task(ignore_result=True)
 def write_command(command):
     # Attempt to simplify the serial read/write logic
     # Write one command only and return ready to calling function (let calling function deal with iterables)
@@ -110,7 +110,7 @@ def write_command(command):
             logger.warn("MSG: '%s'" % data_read)
 
 
-@celery.task
+@celery.task(ignore_result=True)
 def load_setup():
     # Calculate where the home position is in steps
     # (Tested this and it revealed an error in my previously asserted home position. Updated measurements)
@@ -144,7 +144,7 @@ def load_setup():
     logger.warn("Setup done!")
 
 
-@celery.task
+@celery.task(ignore_result=True)
 def load_file(pg_file_name):
     with open(pg_file_name) as pg_file:
         for i, line in enumerate(pg_file):

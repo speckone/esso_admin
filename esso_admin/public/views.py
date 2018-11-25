@@ -43,6 +43,6 @@ def drawbot():
 @blueprint.route('/action/<action_id>', methods=('GET', 'POST',))
 def action(action_id):
     if action_id == 'setup':
-        load_setup.apply_async()
+        load_setup.delay()
         return redirect(url_for('public.home'))
     return redirect(url_for('public.home'))
