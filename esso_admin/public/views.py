@@ -33,7 +33,7 @@ def drawbot():
     if form.validate_on_submit():
         file = request.files.get('file')
         if file:
-            filename = secure_filename(form.data.file)
+            filename = secure_filename(form.file.data)
             file.save(os.path.join(current_app.config['APP_DIR'], 'static', filename))
 
     pg_files = PgFile.query.all()
