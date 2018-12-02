@@ -28,6 +28,9 @@ class Config(object):
         db_name=os.environ.get('POSTGRES_DB', 'fakeDB'),
         host=os.environ.get('POSTGRES_HOST', 'fakeDbHost')
     )
+    CELERY_ROUTES = {"esso_admin.public.tasks.load_setup": {"queue": "default"},
+                     "esso_admin.public.tasks.load_file": {"queue": "default"},
+                     "esso_admin.public.tasks.write_command": {"queue": "drawbot"}}
 
 
 class ProdConfig(Config):

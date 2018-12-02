@@ -74,6 +74,7 @@ def register_shellcontext(app):
 def make_celery(app=None):
     app = app or create_app()
     celery.conf.broker_url = app.config['CELERY_BROKER_URL']
+    celery.conf.task_routes = app.config['CELERY_ROUTES']
     celery.conf.update(app.config)
 
     celery.conf.update(app.config)

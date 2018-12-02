@@ -40,9 +40,10 @@ def drawbot():
     return render_template('public/drawbot.html', pg_files=pg_files, form=form)
 
 
-@blueprint.route('/action/<action_id>', methods=('GET', 'POST',))
-def action(action_id):
+@blueprint.route('/action/<action_id>/<file>', methods=('GET', 'POST',))
+def action(action_id, file=None):
     if action_id == 'setup':
         load_setup.delay()
-        return redirect(url_for('public.home'))
-    return redirect(url_for('public.home'))
+    elif action_id == 'file':
+        load_file.delay(file)
+    return redirect(url_for('public.drawbot'))
