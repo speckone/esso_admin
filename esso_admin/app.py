@@ -3,9 +3,8 @@
 import os
 
 from flask import Flask, render_template
-from celery import Celery
 from esso_admin import commands, public, user
-from esso_admin.extensions import bcrypt, cache, csrf_protect, db, debug_toolbar, login_manager, migrate, webpack
+from esso_admin.extensions import bcrypt, cache, csrf_protect, db, debug_toolbar, login_manager, migrate, webpack, celery
 from esso_admin.settings import ProdConfig
 
 
@@ -72,8 +71,11 @@ def register_shellcontext(app):
     app.shell_context_processor(shell_context)
 
 
-def make_celery(app):
-    celery = Celery(__name__, broker=app.config['CELERY_BROKER_URL'])
+def make_celery(app=None):
+    app = app or create_app()
+    celery.conf.broker_url = app.config['CELERY_BROKER_URL']
+    celery.conf.update(app.config)
+
     celery.conf.update(app.config)
     TaskBase = celery.Task
 

@@ -1,4 +1,5 @@
 import os
+from flask import current_app
 from celery.signals import celeryd_after_setup
 from celery.utils.log import get_task_logger
 import serial
@@ -146,6 +147,7 @@ def load_setup():
 
 @celery.task(ignore_result=True)
 def load_file(pg_file_name):
-    with open(pg_file_name) as pg_file:
+    filename = os.path.join(current_app.config['APP_DIR'], 'static', pg_file_name)
+    with open(filename) as pg_file:
         for i, line in enumerate(pg_file):
             write_command.apply_async(line.strip())
