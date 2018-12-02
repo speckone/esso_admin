@@ -45,5 +45,5 @@ def action(action_id, file=None):
     if action_id == 'setup':
         load_setup.delay()
     elif action_id == 'file':
-        load_file.delay(file)
+        load_file.apply_async(args=[file,])
     return redirect(url_for('public.drawbot'))

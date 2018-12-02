@@ -151,5 +151,5 @@ def load_setup():
 def load_file(pg_file_name):
     filename = os.path.join(current_app.config['APP_DIR'], 'static', pg_file_name)
     with open(filename) as pg_file:
-        for i, line in enumerate(pg_file):
-            write_command.apply_async(line.strip())
+        job = group(write_command.s(command) for i, line in enumerate(pg_file))
+        job.apply_async()
