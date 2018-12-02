@@ -6,6 +6,7 @@ import serial
 import time
 import math
 from esso_admin.extensions import celery
+from celery import group
 
 logger = get_task_logger(__name__)
 
@@ -14,7 +15,6 @@ COMPORT = "/dev/ttyUSB0"
 BAUD = 57600
 polargraph_ready_seen = False
 serial_port = None
-
 
 polargraph_width_in_mm = 644  # Width between pulleys
 polargraph_height_in_mm = 610  # Height of machine
@@ -138,9 +138,8 @@ def load_setup():
     logger.warn("Setting up the controller...")
     logger.warn("")
 
-    for command in setup_commands:
-        logger.warn("Sending %s" % (command))
-        write_command.apply_async(command)
+    job = group(write_command.s(command) for command in setup_commands)
+    job.apply_async()
 
     logger.warn("")
     logger.warn("Setup done!")
