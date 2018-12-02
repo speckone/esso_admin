@@ -139,6 +139,7 @@ def load_setup():
     logger.warn("")
 
     for command in setup_commands:
+        logger.warn("Sending %s" % (command))
         write_command.apply_async(command)
 
     logger.warn("")
