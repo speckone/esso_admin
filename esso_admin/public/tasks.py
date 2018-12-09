@@ -39,6 +39,9 @@ def connect_serial(sender, instance, **kwargs):
     global serial_port
     serial_port = serial.Serial(COMPORT, BAUD, timeout=10)
     logger.warn("Connected: %s" % serial_port.isOpen())
+    logger.warn("Worker: %s" % sender)
+    load_setup.delay()
+
 
 
 def get_string_lengths(x, y):
