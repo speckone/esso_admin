@@ -41,6 +41,7 @@ module.exports = {
   },
   module: {
     loaders: [
+      { test: require.resolve('jquery'), loaders: ['expose-loader?$', 'expose-loader?jQuery'] },
       { test: /\.html$/, loader: 'raw-loader' },
       { test: /\.less$/, loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: 'css-loader!less-loader' }) },
       { test: /\.css$/, loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: 'css-loader' }) },
@@ -52,7 +53,13 @@ module.exports = {
   },
   plugins: [
     new ExtractTextPlugin('[name].[hash].css'),
-    new webpack.ProvidePlugin({ $: 'jquery', jQuery: 'jquery' }),
+    new webpack.ProvidePlugin({
+        $: 'jquery',
+        jQuery: 'jquery',
+        'window.jQuery': 'jquery',
+        'window.$': 'jquery'
+
+    }),
     new ManifestRevisionPlugin(path.join(__dirname, 'esso_admin', 'webpack', 'manifest.json'), {
       rootAssetPath,
       ignorePaths: ['/js', '/css'],

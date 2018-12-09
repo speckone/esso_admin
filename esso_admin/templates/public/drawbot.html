@@ -1,6 +1,16 @@
 {% extends "layout.html" %}
 {% import "wtf.html" as wtf %}
 {% block content %}
+
+    <div class="row">
+        <table class="table" id="ql">
+            <thead>
+                <tr>
+                    <th>Items</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
     <div class="row">
         <table class="table">
             <thead>
@@ -10,11 +20,16 @@
             </thead>
             <tbody>
             {% for pg_file in pg_files %}
-                <tr><td>{{ pg_file }}</td></tr>
+                <tr>
+                    <td>{{ pg_file }}</td>
+                    <td><a href="{{ url_for('public.action', action_id='setup', file='None') }}">Initialize</a></td>
+                    <td><a href="{{ url_for('public.action', action_id='file', file=pg_file.file) }}">Draw</a></td>
+                </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
+    <br>
     <div class="row">
         <div class="col-sm">
             <p>Upload</p>
@@ -34,5 +49,36 @@
 
         </div>
     </div>
+{% endblock %}
+
+{% block js %}
+<script>
+{{ super() }}
+function setupData() {
+    $(document).ready(function () {
+        var refreshTable = $('#ql').DataTable({
+            "ajax": {
+                "url": "{{ url_for('public.queue_length') }}",
+                "dataType": "json",
+                "dataSrc": "data",
+                "contentType": "application/json"
+            },
+            "columns": [
+                {"data": "queue_length"},
+            ],
+            "bFilter": false,
+            "bPaginate": false,
+            "bInfo": false
+        });
+       setInterval (function test() {
+         refreshTable.ajax.reload();
+       }, 10000);
+
+    });
+}
+
+$( window ).on( "load", setupData );
+</script>
+
 {% endblock %}
 

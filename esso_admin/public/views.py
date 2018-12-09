@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Public section, including homepage and signup."""
 from flask import Blueprint, flash, redirect, render_template, request, url_for, current_app
+from flask.json import jsonify
 from werkzeug.utils import secure_filename
 import os
 
@@ -8,10 +9,9 @@ import os
 from esso_admin.public.forms import PgUploadForm
 from esso_admin.public.models import PgFile
 from esso_admin.public.tasks import load_setup, load_file
+from esso_admin.extensions import celery
 
 blueprint = Blueprint('public', __name__, static_folder='../static')
-
-
 
 
 @blueprint.route('/', methods=['GET', 'POST'])
@@ -38,6 +38,16 @@ def drawbot():
             pg_file = PgFile.create(name=form.name.data, file=filename)
     pg_files = PgFile.query.all()
     return render_template('public/drawbot.html', pg_files=pg_files, form=form)
+
+
+@blueprint.route('/queue_length')
+def queue_length():
+    queue_length = 0
+    with celery.pool.acquire(block=True) as conn:
+        queue_length = conn.default_channel.client.llen('drawbot')
+    ql = [{'queue_length': queue_length}]
+    return jsonify({'data': ql})
+
 
 
 @blueprint.route('/action/<action_id>/<file>', methods=('GET', 'POST',))

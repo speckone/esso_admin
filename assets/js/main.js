@@ -9,6 +9,7 @@ require('jquery');
 require('font-awesome-webpack');
 require('popper.js');
 require('bootstrap');
+import dt from 'datatables.net';
 
 // Your own code
 require('./plugins.js');
