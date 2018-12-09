@@ -36,11 +36,12 @@ page_y_offset_in_mm = 120  # How far (in mm) down from the imaginary line drawn 
 
 @celeryd_after_setup.connect
 def connect_serial(sender, instance, **kwargs):
-    global serial_port
-    serial_port = serial.Serial(COMPORT, BAUD, timeout=10)
-    logger.warn("Connected: %s" % serial_port.isOpen())
     logger.warn("Worker: %s" % sender)
-    load_setup.delay()
+    if 'drawbot' in sender:
+        global serial_port
+        serial_port = serial.Serial(COMPORT, BAUD, timeout=10)
+        logger.warn("Connected: %s" % serial_port.isOpen())
+        load_setup.delay()
 
 
 
