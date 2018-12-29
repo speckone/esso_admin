@@ -16,7 +16,8 @@ COMPORT = "/dev/ttyUSB0"
 BAUD = 57600
 polargraph_ready_seen = False
 serial_port = None
-redis = Redis(host=os.environ.get('REDIS_HOST'), password=os.environ.get('REDIS_PASS'))
+#redis = Redis(host=os.environ.get('REDIS_HOST'), password=os.environ.get('REDIS_PASS'))
+redis = Redis.from_url(current_app.config['CELERY_BROKER_URL'])
 
 polargraph_width_in_mm = 644  # Width between pulleys
 polargraph_height_in_mm = 610  # Height of machine
@@ -48,7 +49,6 @@ def connect_serial(sender, instance, **kwargs):
         load_setup.delay(set_home=True)
 
 
-
 def get_string_lengths(x, y):
     whole_steps_per_mm = float(polargraph_steps_per_rev) / float(polargraph_pulley_circumference_in_mm)
     c = polargraph_width_in_mm - x
@@ -66,6 +66,7 @@ def get_string_lengths(x, y):
 def set_last_position(pos_x, pos_y):
     redis.set('last_know_position_x', pos_x)
     redis.set('last_know_position_y', pos_y)
+
 
 @celery.task(ignore_result=True)
 def write_command(command):
