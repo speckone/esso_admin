@@ -7,6 +7,7 @@ import time
 import math
 from esso_admin.extensions import celery
 from celery import group
+from redis import Redis
 
 logger = get_task_logger(__name__)
 
@@ -15,6 +16,7 @@ COMPORT = "/dev/ttyUSB0"
 BAUD = 57600
 polargraph_ready_seen = False
 serial_port = None
+redis = Redis(host=os.environ.get('REDIS_HOST'), password=os.environ.get('REDIS_PASS'))
 
 polargraph_width_in_mm = 644  # Width between pulleys
 polargraph_height_in_mm = 610  # Height of machine
@@ -41,7 +43,7 @@ def connect_serial(sender, instance, **kwargs):
         global serial_port
         serial_port = serial.Serial(COMPORT, BAUD, timeout=10)
         logger.warn("Connected: %s" % serial_port.isOpen())
-        load_setup.delay()
+        load_setup.s(set_home=True)
 
 
 
@@ -58,6 +60,10 @@ def get_string_lengths(x, y):
     steps2_rounded = int(round(steps2))
     return steps1_rounded, steps2_rounded
 
+
+def set_last_position(pos_x, pos_y):
+    redis.set('last_know_position_x', pos_x)
+    redis.set('last_know_position_y', pos_y)
 
 @celery.task(ignore_result=True)
 def write_command(command):
@@ -81,7 +87,7 @@ def write_command(command):
         if number_of_bytes_waiting > 0:
             logger.warn("Debug: Bytes waiting in serial port = %s" % number_of_bytes_waiting)
 
-        data_read = serial_port.read(number_of_bytes_waiting).strip().decode()
+        data_read = serial_port.read(number_of_bytes_waiting).strip().decode('ascii')
         time.sleep(0.1)
 
         if "READY" in data_read or polargraph_ready_seen == True:
@@ -89,7 +95,13 @@ def write_command(command):
             # or polargraphReadySeen should be true (is '%s')" % (data_read, polargraphReadySeen))
             if not exit_flag:
                 # logger.warn("Debug: exitFlag should be false here. Is %s" % exitFlag)
-                logger.warn("Write command: %s" % command)
+                logger. warn("Write command: %s" % command)
+                if command.startswith('C09'):
+                    command_code, command_x, command_y, end = command.split(',')
+                    set_last_position(command_x, command_y)
+                elif command.startswith('C17'):
+                    command_code, command_x, command_y, command_len, end = command.split(',')
+                    set_last_position(command_x, command_y)
                 # serialPort.flush()
                 serial_port.write(command.encode('ascii'))
 
@@ -118,10 +130,15 @@ def write_command(command):
 
 
 @celery.task(ignore_result=True)
-def load_setup():
-    # Calculate where the home position is in steps
-    # (Tested this and it revealed an error in my previously asserted home position. Updated measurements)
-    polargraph_home_x_in_steps, polargraph_home_y_in_steps = get_string_lengths(polargraph_home_x_in_mm,
+def load_setup(set_home=False):
+    if set_home:
+        polargraph_home_x_in_steps = redis.get('last_know_position_x')
+        polargraph_home_y_in_steps = redis.get('last_know_position_y')
+        if not(polargraph_home_x_in_steps and polargraph_home_y_in_steps):
+            polargraph_home_x_in_steps, polargraph_home_y_in_steps = get_string_lengths(polargraph_home_x_in_mm,
+                                                                                        polargraph_home_y_in_mm)
+    else:
+        polargraph_home_x_in_steps, polargraph_home_y_in_steps = get_string_lengths(polargraph_home_x_in_mm,
                                                                                 polargraph_home_y_in_mm)
     logger.warn("Debug: Calculated home position = %s, %s" % (polargraph_home_x_in_steps, polargraph_home_x_in_steps))
 
@@ -136,7 +153,8 @@ def load_setup():
                       "C45," + str(polargraph_pen_up_setting) + "," + str(
                           polargraph_pen_down_setting) + ",1,END\n",
                       "C09," + str(polargraph_home_x_in_steps) + "," + str(
-                          polargraph_home_y_in_steps) + ",END\n", "C13," + str(polargraph_pen_up_setting) + ",END\n",
+                          polargraph_home_y_in_steps) + ",END\n",
+                      "C13," + str(polargraph_pen_up_setting) + ",END\n",
                       "C14," + str(polargraph_pen_down_setting) + ",END\n"]
 
     logger.warn("Debug: Command list contains %s" % (setup_commands,))
