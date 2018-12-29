@@ -17,7 +17,7 @@ BAUD = 57600
 polargraph_ready_seen = False
 serial_port = None
 #redis = Redis(host=os.environ.get('REDIS_HOST'), password=os.environ.get('REDIS_PASS'))
-redis = Redis.from_url(current_app.config['CELERY_BROKER_URL'])
+redis = Redis.from_url(os.environ.get('REDIS_URL'))
 
 polargraph_width_in_mm = 644  # Width between pulleys
 polargraph_height_in_mm = 610  # Height of machine
