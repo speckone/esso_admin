@@ -93,7 +93,7 @@ def write_command(command):
         if number_of_bytes_waiting > 0:
             logger.warn("Debug: Bytes waiting in serial port = %s" % number_of_bytes_waiting)
 
-        data_read = serial_port.read(number_of_bytes_waiting).strip().decode('ascii')
+        data_read = serial_port.read(number_of_bytes_waiting).strip().decode()
         time.sleep(0.1)
 
         if "READY" in data_read or polargraph_ready_seen == True:
