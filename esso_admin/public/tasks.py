@@ -27,8 +27,8 @@ polargraph_steps_per_rev = 400  # Number of whole steps per revolution for motor
 polargraph_steps_multiplier = 1  # Stepper driver multiplier
 polargraph_motor_max_speed = 600  # Max motor speed
 polargraph_motor_acceleration = 400  # How quickly the motor accelerates to get to its top speed
-polargraph_pen_up_setting = 180  # Servo 'up' position
-polargraph_pen_down_setting = 107  # Servo 'down' position
+polargraph_pen_up_setting = 30  # Servo 'up' position
+polargraph_pen_down_setting = 110  # Servo 'down' position
 
 page_width_in_mm = 610  # Drawing area in mm
 page_height_in_mm = 489  # Drawing area in mm
