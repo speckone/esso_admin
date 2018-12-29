@@ -89,9 +89,10 @@ def write_command(command):
         # logger.warn("")
         # logger.warn("Debug: Reading serial port section starts here:")
 
-            number_of_bytes_waiting = serial_port.in_waiting
+        number_of_bytes_waiting = serial_port.in_waiting
         if number_of_bytes_waiting > 0:
             logger.warn("Debug: Bytes waiting in serial port = %s" % number_of_bytes_waiting)
+
         data_read = serial_port.read(number_of_bytes_waiting).strip().decode(encoding='utf-8', errors='ignore')
         time.sleep(0.1)
 
