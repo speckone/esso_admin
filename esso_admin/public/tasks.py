@@ -16,7 +16,7 @@ COMPORT = "/dev/ttyUSB0"
 BAUD = 57600
 polargraph_ready_seen = False
 serial_port = None
-redis = Redis(host=os.environ.get('REDIS_HOST'), password=os.environ.get('REDIS_PASS'), db=0)
+redis = None
 
 polargraph_width_in_mm = 644  # Width between pulleys
 polargraph_height_in_mm = 610  # Height of machine
@@ -40,9 +40,14 @@ page_y_offset_in_mm = 120  # How far (in mm) down from the imaginary line drawn 
 def connect_serial(sender, instance, **kwargs):
     logger.warn("Worker: %s" % sender)
     if 'drawbot' in sender:
-        global serial_port
+        global serial_port, redis
         serial_port = serial.Serial(COMPORT, BAUD, timeout=10)
+        redis_host = os.environ.get('REDIS_HOST')
+        redis_pass = os.environ.get('REDIS_PASS')
+        redis = Redis(host=redis_host, password=redis_pass, db=0)
         logger.warn("Connected: %s" % serial_port.isOpen())
+        logger.warn("Redis host: %s" % redis_host)
+        logger.warn("Redis pass: %s" % redis_pass)
         logger.warn("Redis: %s" % redis)
         load_setup.delay(set_home=True)
 
