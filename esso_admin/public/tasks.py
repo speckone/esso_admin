@@ -49,7 +49,7 @@ def connect_serial(sender, instance, **kwargs):
         logger.warn("Redis host: %s" % redis_host)
         logger.warn("Redis pass: %s" % redis_pass)
         logger.warn("Redis: %s" % redis)
-        load_setup.delay(set_home=True)
+        load_setup(set_home=True)
 
 
 def get_string_lengths(x, y):
