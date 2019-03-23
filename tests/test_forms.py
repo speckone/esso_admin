@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test forms."""
 
-from esso_admin.public.forms import LoginForm
+from esso_admin.drawbot.forms import LoginForm
 from esso_admin.user.forms import RegisterForm
 
 
